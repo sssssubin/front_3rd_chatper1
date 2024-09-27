@@ -41,11 +41,6 @@ const handleLinkClick = (e) => {
   }
 };
 
-// 전역 에러 처리
-const handleGlobalError = (e) => {
-  e.preventDefault();
-};
-
 // 초기화 처리
 const initializeApp = () => {
   router.handleRoute(window.location.pathname);
@@ -55,4 +50,3 @@ const initializeApp = () => {
 // 초기화
 document.addEventListener('DOMContentLoaded', initializeApp);
 document.addEventListener('click', handleLinkClick);
-window.addEventListener('error', handleGlobalError);

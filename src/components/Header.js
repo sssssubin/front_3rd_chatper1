@@ -9,9 +9,8 @@ export const Header = (isLoggedIn) => {
       <ul class="flex justify-around">
         <li><a href="/" class="text-blue-600 font-bold">홈</a></li>
         ${
-          isLoggedIn
-            ? '<li><a href="/profile" class="text-gray-600">프로필</a></li>'
-            : ''
+          isLoggedIn &&
+          '<li><a href="/profile" class="text-gray-600">프로필</a></li>'
         }
         ${
           isLoggedIn

@@ -1,6 +1,16 @@
 import { UserPreferences } from '../services/UserPreferences';
 import Router from '../router/Router';
 
+// 에러 바운더리 처리 함수
+function errorBoundary(error) {
+  document.querySelector('#root').innerHTML = `
+    <div>
+      <p>오류 발생!</p>
+      <p>${error.message}</p>
+    </div>
+  `;
+}
+
 export const renderLoginPage = () => {
   document.querySelector('#root').innerHTML = `
     <main class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -26,21 +36,11 @@ export const renderLoginPage = () => {
     </main>
   `;
 
-  // 사용자 이름 입력 이벤트 핸들러 등록
-  const $username = document.querySelector('#username');
-  $username.addEventListener(
-    'input',
-    (e) => {
-      try {
-        if (e.target.value === '1') {
-          throw new Error('의도적인 오류입니다.');
-        }
-      } catch (error) {
-        errorBoundary(error); // 에러를 에러 바운더리에 전달
-      }
-    },
-    { once: true }
-  );
+  // 에러 발생 시 에러 바운더리로 전달
+  window.addEventListener('error', (e) => {
+    e.preventDefault();
+    errorBoundary(e.error);
+  });
 
   // 로그인 폼 제출 이벤트 핸들러
   document.getElementById('login-form').addEventListener('submit', (e) => {
@@ -60,13 +60,3 @@ export const renderLoginPage = () => {
     router.navigateTo('/profile');
   });
 };
-
-// 에러 바운더리 처리 함수
-function errorBoundary(error) {
-  document.querySelector('#root').innerHTML = `
-    <div>
-      <p>오류 발생!</p>
-      <p>${error.message}</p>
-    </div>
-  `;
-}
