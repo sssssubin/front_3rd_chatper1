@@ -4,9 +4,11 @@ import { renderProfilePage } from './pages/ProfilePage';
 import { renderLoginPage } from './pages/LoginPage';
 import { renderNotFoundPage } from './pages/NotFoundPage';
 
+// 라우터 인스턴스 생성 및 초기화
 const router = Router.getInstance();
-router.init(); // 라우터 초기화
+router.init();
 
+// 라우팅 경로 설정
 const routes = [
   { path: '/', component: renderHomePage },
   { path: '/profile', component: renderProfilePage },
@@ -19,7 +21,7 @@ routes.forEach((route) => {
   router.addRoute(route.path, () => route.component(router.isLoggedIn));
 });
 
-// 메뉴 활성화
+// 현재 활성화된 메뉴 강조 처리
 const handleMenuActive = (currentPath) => {
   const navLinks = document.querySelectorAll('nav a');
 
@@ -41,12 +43,12 @@ const handleLinkClick = (e) => {
   }
 };
 
-// 초기화 처리
+// 애플리케이션 초기화 처리
 const initializeApp = () => {
   router.handleRoute(window.location.pathname);
   handleMenuActive(window.location.pathname);
 };
 
-// 초기화
+// 이벤트 리스너 등록
 document.addEventListener('DOMContentLoaded', initializeApp);
 document.addEventListener('click', handleLinkClick);
