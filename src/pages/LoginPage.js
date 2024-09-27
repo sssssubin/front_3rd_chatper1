@@ -38,7 +38,6 @@ export const renderLoginPage = () => {
 
   // 에러 발생 시 에러 바운더리로 전달
   window.addEventListener('error', (e) => {
-    e.preventDefault();
     errorBoundary(e.error);
   });
 
