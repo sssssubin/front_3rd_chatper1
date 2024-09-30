@@ -2,9 +2,6 @@ import Router from './router/Router';
 import { UserPreferences } from './services/UserPreferences';
 import { routes } from './routes';
 
-// 라우터 인스턴스 생성 및 초기화
-const router = Router;
-
 // 경로 가드 설정
 const routeGuard = (route) => {
   // 로그인 상태를 확인하기 위해 getter를 호출
@@ -15,9 +12,9 @@ const routeGuard = (route) => {
 };
 
 // 라우팅 설정
-router.routeGuard(routeGuard);
+Router.routeGuard(routeGuard);
 routes.forEach((route) => {
-  router.addRoute(route.path, () => router.executeGuard(route));
+  Router.addRoute(route.path, () => Router.executeGuard(route));
 });
 
 // 현재 활성화된 메뉴 강조 처리
@@ -34,7 +31,7 @@ const handleMenuActive = (currentPath) => {
 
 // 링크 클릭 시 페이지 전환 및 메뉴 활성화
 const navigateToLink = (path) => {
-  router.navigateTo(path);
+  Router.navigateTo(path);
   handleMenuActive(path);
 };
 
@@ -57,14 +54,14 @@ const handleLoginSuccess = () => {
   };
   UserPreferences.set(userInfo); // LocalStorage에 사용자 정보 저장
 
-  router.handleLogin();
+  Router.handleLogin();
   navigateToLink('/profile'); // 프로필 페이지로 이동
 };
 
 // 로그아웃 성공 처리
 const handleLogoutSuccess = () => {
   UserPreferences.delete(); // 사용자 정보 삭제
-  router.handleLogout();
+  Router.handleLogout();
   navigateToLink('/'); // 홈 페이지로 이동
 };
 
@@ -83,7 +80,7 @@ const handleProfileUpdateSuccess = () => {
 
 // 애플리케이션 초기화 처리
 const initializeApp = () => {
-  router.handleRoute(window.location.pathname);
+  Router.handleRoute(window.location.pathname);
   handleMenuActive(window.location.pathname);
 };
 
