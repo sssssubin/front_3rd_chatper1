@@ -45,17 +45,7 @@ export const renderLoginPage = () => {
   document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const userInfo = {
-      username: document.getElementById('username').value,
-      email: '',
-      bio: '',
-      isLoggedIn: true,
-    };
-
-    // LocalStorage에 데이터 저장 (key: 'user')
-    UserPreferences.set(userInfo);
-    const router = Router.getInstance();
-    router.handleLogin();
-    router.navigateTo('/profile');
+    // 로그인 후 페이지 전환을 main.js에서 처리하도록 이벤트 발생
+    window.dispatchEvent(new Event('loginSuccess'));
   });
 };

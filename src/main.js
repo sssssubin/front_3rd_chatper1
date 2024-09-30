@@ -1,24 +1,23 @@
 import Router from './router/Router';
-import { renderHomePage } from './pages/HomePage';
-import { renderProfilePage } from './pages/ProfilePage';
-import { renderLoginPage } from './pages/LoginPage';
-import { renderNotFoundPage } from './pages/NotFoundPage';
+import { UserPreferences } from './services/UserPreferences';
+import { routes } from './routes';
 
 // 라우터 인스턴스 생성 및 초기화
-const router = Router.getInstance();
-router.init();
+const router = Router;
 
-// 라우팅 경로 설정
-const routes = [
-  { path: '/', component: renderHomePage },
-  { path: '/profile', component: renderProfilePage },
-  { path: '/login', component: renderLoginPage },
-  { path: '/404', component: renderNotFoundPage },
-];
+// 경로 가드 설정
+const routeGuard = (route) => {
+  // 로그인 상태를 확인하기 위해 getter를 호출
+  const isLoggedIn = UserPreferences.preferences.isLoggedIn;
+
+  // 외부에서 설정된 핸들러를 호출
+  route.handler(isLoggedIn);
+};
 
 // 라우팅 설정
+router.routeGuard(routeGuard);
 routes.forEach((route) => {
-  router.addRoute(route.path, () => route.component(router.isLoggedIn));
+  router.addRoute(route.path, () => router.executeGuard(route));
 });
 
 // 현재 활성화된 메뉴 강조 처리
@@ -33,14 +32,53 @@ const handleMenuActive = (currentPath) => {
   });
 };
 
-// 네비게이션 이벤트 처리 (링크 클릭 시 페이지 전환)
+// 링크 클릭 시 페이지 전환 및 메뉴 활성화
+const navigateToLink = (path) => {
+  router.navigateTo(path);
+  handleMenuActive(path);
+};
+
+// 네비게이션 이벤트 처리
 const handleLinkClick = (e) => {
   const link = e.target.closest('nav a');
   if (link) {
     e.preventDefault();
-    router.navigateTo(link.pathname);
-    handleMenuActive(link.pathname);
+    navigateToLink(link.pathname);
   }
+};
+
+// 로그인 성공 처리
+const handleLoginSuccess = () => {
+  const userInfo = {
+    username: document.getElementById('username').value,
+    email: '',
+    bio: '',
+    isLoggedIn: true,
+  };
+  UserPreferences.set(userInfo); // LocalStorage에 사용자 정보 저장
+
+  router.handleLogin();
+  navigateToLink('/profile'); // 프로필 페이지로 이동
+};
+
+// 로그아웃 성공 처리
+const handleLogoutSuccess = () => {
+  UserPreferences.delete(); // 사용자 정보 삭제
+  router.handleLogout();
+  navigateToLink('/'); // 홈 페이지로 이동
+};
+
+// 프로필 업데이트 성공 처리
+const handleProfileUpdateSuccess = () => {
+  const userInfo = {
+    username: document.getElementById('username').value,
+    email: document.getElementById('email').value,
+    bio: document.getElementById('bio').value,
+    isLoggedIn: UserPreferences.preferences.isLoggedIn,
+  };
+
+  UserPreferences.set(userInfo); // LocalStorage에 사용자 정보 업데이트
+  alert('프로필이 업데이트되었습니다.');
 };
 
 // 애플리케이션 초기화 처리
@@ -52,3 +90,6 @@ const initializeApp = () => {
 // 이벤트 리스너 등록
 document.addEventListener('DOMContentLoaded', initializeApp);
 document.addEventListener('click', handleLinkClick);
+window.addEventListener('loginSuccess', handleLoginSuccess);
+window.addEventListener('logoutSuccess', handleLogoutSuccess);
+window.addEventListener('profileUpdateSuccess', handleProfileUpdateSuccess);

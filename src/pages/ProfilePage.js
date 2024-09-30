@@ -1,5 +1,4 @@
 import { UserPreferences } from '../services/UserPreferences.js';
-import Router from '../router/Router.js';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 
@@ -45,29 +44,14 @@ export const renderProfilePage = (isLoggedIn) => {
 
   document.getElementById('profile-form').addEventListener('submit', (e) => {
     e.preventDefault();
-
-    const userInfo = {
-      username: document.getElementById('username').value,
-      email: document.getElementById('email').value,
-      bio: document.getElementById('bio').value,
-    };
-
-    // LocalStorage에 데이터 저장 (key: 'user')
-    UserPreferences.set(userInfo);
-    alert('프로필이 업데이트되었습니다.');
+    window.dispatchEvent(new Event('profileUpdateSuccess'));
   });
 
   // 로그아웃 버튼 클릭 이벤트 리스너 추가
   if (isLoggedIn) {
     document.getElementById('logout').addEventListener('click', (e) => {
       e.preventDefault();
-
-      // LocalStorage에서 데이터 삭제 (key: 'user')
-      UserPreferences.delete();
-
-      const router = Router.getInstance();
-      router.handleLogout();
-      router.navigateTo('/');
+      window.dispatchEvent(new Event('logoutSuccess'));
     });
   }
 };

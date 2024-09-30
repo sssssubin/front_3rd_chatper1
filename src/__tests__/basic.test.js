@@ -109,7 +109,7 @@ describe('기본과제 테스트', () => {
       );
 
       expect(localStorage.getItem('user')).toEqual(
-        `{"username":"testuser","email":"","bio":"Updated bio"}`
+        `{"username":"testuser","email":"","bio":"Updated bio","isLoggedIn":true}`
       );
     });
   });

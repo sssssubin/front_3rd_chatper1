@@ -1,71 +1,65 @@
-import { UserPreferences } from '../services/UserPreferences';
+// Router 구현
+const Router = {
+  routes: {},
+  guard: null,
+  isLoggedIn: false,
 
-// Router 구현 (싱글톤 패턴 적용)
-const Router = (function () {
-  let instance;
+  addRoute(path, handler) {
+    this.routes[path] = handler;
+  },
 
-  function createInstance() {
-    return {
-      routes: {},
-      // 로그인 상태를 확인하기 위해 getter를 호출
-      isLoggedIn: !!UserPreferences.preferences.isLoggedIn, // 여기서 실제 로컬 스토리지에서 데이터가 로드됨
-      addRoute(path, handler) {
-        this.routes[path] = handler;
-      },
+  navigateTo(path) {
+    history.pushState(null, '', path);
+    this.handleRoute(path);
+  },
 
-      navigateTo(path) {
-        history.pushState(null, '', path);
-        this.handleRoute(path);
-      },
+  handlePopState() {
+    this.handleRoute(window.location.pathname);
+  },
 
-      handlePopState() {
-        this.handleRoute(window.location.pathname);
-      },
+  handleRoute(path) {
+    const handler = this.routes[path] || this.routes['/404'];
+    this.executeHandler(handler);
+  },
 
-      handleRoute(path) {
-        const loginStatusRedirects = {
-          '/profile': '/login', // 비로그인 상태에서는 프로필 접근 시 로그인 페이지로 리다이렉트
-          '/login': '/', // 로그인 상태에서 로그인 페이지 접근 시 메인 페이지로 리다이렉트
-        };
+  executeHandler(handler) {
+    if (handler) {
+      handler(); // 외부에서 설정된 핸들러를 호출
+    } else {
+      console.error(`No handler found for path: ${path}`); // 핸들러가 없을 경우 에러 로그
+    }
+  },
 
-        if (loginStatusRedirects[path]) {
-          if (
-            (path === '/profile' && !this.isLoggedIn) ||
-            (path === '/login' && this.isLoggedIn)
-          ) {
-            this.navigateTo(loginStatusRedirects[path]);
-            return;
-          }
-        }
+  routeGuard(guard) {
+    this.guard = guard;
+  },
 
-        const handler = this.routes[path] || this.routes['/404'];
-        handler();
-      },
+  executeGuard(route) {
+    if (this.guard) {
+      this.guard(route);
+    } else {
+      this.handleRoute(route.path);
+    }
+  },
 
-      setLoginStatus(status) {
-        this.isLoggedIn = status;
-      },
+  setLoginStatus(status) {
+    this.isLoggedIn = status;
+  },
 
-      handleLogin() {
-        this.setLoginStatus(true);
-      },
+  handleLogin() {
+    this.setLoginStatus(true);
+  },
 
-      handleLogout() {
-        this.setLoginStatus(false);
-      },
+  handleLogout() {
+    this.setLoginStatus(false);
+  },
 
-      init() {
-        window.addEventListener('popstate', this.handlePopState.bind(this));
-      },
-    };
-  }
+  init() {
+    window.addEventListener('popstate', this.handlePopState.bind(this));
+  },
+};
 
-  return {
-    getInstance() {
-      if (!instance) instance = createInstance();
-      return instance;
-    },
-  };
-})();
+// 라우터 인스턴스 초기화
+Router.init();
 
 export default Router;

@@ -1,5 +1,4 @@
 import { UserPreferences } from '../services/UserPreferences.js';
-import Router from '../router/Router.js';
 import { Header } from '../components/Header.js';
 import { Footer } from '../components/Footer.js';
 import { PostList } from '../components/PostList.js';
@@ -27,13 +26,7 @@ export const renderHomePage = (isLoggedIn) => {
   if (isLoggedIn) {
     document.getElementById('logout').addEventListener('click', (e) => {
       e.preventDefault();
-
-      // LocalStorage에서 데이터 삭제
-      UserPreferences.delete();
-
-      const router = Router.getInstance();
-      router.handleLogout();
-      router.navigateTo('/');
+      window.dispatchEvent(new Event('logoutSuccess'));
     });
   }
 };
